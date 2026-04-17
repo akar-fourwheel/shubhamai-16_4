@@ -126,6 +126,7 @@ def transcribe_audio(audio_bytes: bytes, language_hint: str = "hi-IN") -> dict:
     try:
         result = _groq_stt(audio_bytes)
         if result.get("text"):
+            print(f"[STT] ✅ groq | lang={result.get('language')} | text='{result['text'][:60]}'")
             return result
     except Exception as e:
         print(f"[Voice] Groq STT failed: {e}, trying Sarvam")
@@ -133,11 +134,13 @@ def transcribe_audio(audio_bytes: bytes, language_hint: str = "hi-IN") -> dict:
     try:
         result = _sarvam_stt(audio_bytes, _lang_to_code(language_hint))
         if result.get("text"):
+            print(f"[STT] ✅ sarvam | lang={result.get('language')} | text='{result['text'][:60]}'")
             return result
     except Exception as e:
         print(f"[Voice] Sarvam STT failed: {e}, trying Deepgram")
 
     try:
+        print(f"[STT] ✅ deepgram | lang={result.get('language')} | text='{result.get('text','')[:60]}'")
         return _deepgram_stt(audio_bytes)
     except Exception as e:
         print(f"[Voice] Deepgram STT failed: {e}")
