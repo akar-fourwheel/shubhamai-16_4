@@ -99,9 +99,9 @@ async def transcribe_audio_async(audio_bytes: bytes, language_hint: str = "hi-IN
     """
     # [+] CHANGE: Groq Whisper STT first for latency optimization.
     try:
-        print(f"[STT] ✅ groq | lang={result.get('language')} | text='{result['text'][:60]}'")
         result = await _groq_stt_async(audio_bytes)
         if result.get("text"):
+            print(f"[STT] ✅ groq | lang={result.get('language')} | text='{result['text'][:60]}'")
             return result
     except Exception as e:
         print(f"[Voice] Groq STT failed: {e}, trying Sarvam")
@@ -115,8 +115,10 @@ async def transcribe_audio_async(audio_bytes: bytes, language_hint: str = "hi-IN
         print(f"[Voice] Sarvam STT failed: {e}, trying Deepgram")
 
     try:
-        print(f"[STT] ✅ deepgram | lang={result.get('language')} | text='{result.get('text','')[:60]}'")
-        return await _deepgram_stt_async(audio_bytes)
+        result = await _deepgram_stt_async(audio_bytes)
+        if result.get("text"):
+            print(f"[STT] ✅ deepgram | lang={result.get('language')} | text='{result.get('text','')[:60]}'")
+            return result
     except Exception as e:
         print(f"[Voice] Deepgram STT failed: {e}")
         return {"text": "", "language": "unknown", "confidence": 0.0}
@@ -143,8 +145,10 @@ def transcribe_audio(audio_bytes: bytes, language_hint: str = "hi-IN") -> dict:
         print(f"[Voice] Sarvam STT failed: {e}, trying Deepgram")
 
     try:
-        print(f"[STT] ✅ deepgram | lang={result.get('language')} | text='{result.get('text','')[:60]}'")
-        return _deepgram_stt(audio_bytes)
+        result = _deepgram_stt(audio_bytes)
+        if result.get("text"):
+            print(f"[STT] ✅ deepgram | lang={result.get('language')} | text='{result.get('text','')[:60]}'")
+            return result
     except Exception as e:
         print(f"[Voice] Deepgram STT failed: {e}")
         return {"text": "", "language": "unknown", "confidence": 0.0}
