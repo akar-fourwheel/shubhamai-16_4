@@ -99,6 +99,7 @@ async def transcribe_audio_async(audio_bytes: bytes, language_hint: str = "hi-IN
     """
     # [+] CHANGE: Groq Whisper STT first for latency optimization.
     try:
+        print(f"[STT] ✅ groq | lang={result.get('language')} | text='{result['text'][:60]}'")
         result = await _groq_stt_async(audio_bytes)
         if result.get("text"):
             return result
@@ -108,11 +109,13 @@ async def transcribe_audio_async(audio_bytes: bytes, language_hint: str = "hi-IN
     try:
         result = await _sarvam_stt_async(audio_bytes, _lang_to_code(language_hint))
         if result.get("text"):
+            print(f"[STT] ✅ sarvam | lang={result.get('language')} | text='{result['text'][:60]}'")
             return result
     except Exception as e:
         print(f"[Voice] Sarvam STT failed: {e}, trying Deepgram")
 
     try:
+        print(f"[STT] ✅ deepgram | lang={result.get('language')} | text='{result.get('text','')[:60]}'")
         return await _deepgram_stt_async(audio_bytes)
     except Exception as e:
         print(f"[Voice] Deepgram STT failed: {e}")
