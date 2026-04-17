@@ -628,10 +628,20 @@ async def _process_speech(buf: bytes, call_sid: str, stream_sid: str, websocket:
             return
         stt_result = await transcribe_audio_async(wav_bytes, "hi-IN")
         customer_text = stt_result.get("text", "").strip() if stt_result else ""
-        print(f"[Voicebot] STT: '{customer_text[:120]}'")
 
-        if not customer_text:
+        # Filter Whisper hallucinations: non-Hindi/English scripts, single words, filler
+        _has_devanagari = any('\u0900' <= c <= '\u097f' for c in customer_text)
+        _has_latin = any('a' <= c.lower() <= 'z' for c in customer_text)
+        _is_garbage = not (_has_devanagari or _has_latin)
+        _is_filler = customer_text.lower().strip(".,!? ") in {
+            "well", "uh", "um", "oh", "i", "absolutely", "scooter", "menor", "ok", "okay"
+        }
+
+        if not customer_text or _is_garbage or _is_filler or len(customer_text) < 4:
+            print(f"[Voicebot] STT filtered: '{customer_text}'")
             return
+
+        print(f"[Voicebot] STT: '{customer_text[:120]}'")
 
         detected_lang = stt_result.get("language", "hinglish")
         session["language"] = detected_lang
