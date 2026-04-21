@@ -161,6 +161,7 @@ def _groq_stt(audio_bytes: bytes) -> dict:
         file=("audio.wav", audio_bytes),
         model=GROQ_STT_MODEL,
         response_format="verbose_json",
+        language="hi",
     )
     return {
         "text": (getattr(transcript, "text", "") or "").strip(),

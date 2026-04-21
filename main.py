@@ -629,18 +629,9 @@ async def _process_speech(buf: bytes, call_sid: str, stream_sid: str, websocket:
         stt_result = await transcribe_audio_async(wav_bytes, "hi-IN")
         customer_text = stt_result.get("text", "").strip() if stt_result else ""
 
-        # Filter Whisper hallucinations: non-Hindi/English scripts, single words, filler
-        _has_devanagari = any('\u0900' <= c <= '\u097f' for c in customer_text)
-        _has_latin      = any('a' <= c.lower() <= 'z' for c in customer_text)
-        _has_arabic     = any('\u0600' <= c <= '\u06ff' for c in customer_text)  # Urdu
-        _has_digits     = any(c.isdigit() for c in customer_text)
-        _is_garbage     = not (_has_devanagari or _has_latin or _has_arabic or _has_digits)        _is_filler = customer_text.lower().strip(".,!? ") in {
-             "well", "uh", "um", "oh", "i", "menor", "çorunga", "alogyтv"
-        }
-
-        if not customer_text or _is_garbage or _is_filler or len(customer_text) < 4:
+        if not customer_text or len(customer_text) < 3:
             print(f"[Voicebot] STT filtered: '{customer_text}'")
-            return
+            return 
 
         print(f"[Voicebot] STT: '{customer_text[:120]}'")
 
