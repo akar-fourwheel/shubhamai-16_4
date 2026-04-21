@@ -631,10 +631,11 @@ async def _process_speech(buf: bytes, call_sid: str, stream_sid: str, websocket:
 
         # Filter Whisper hallucinations: non-Hindi/English scripts, single words, filler
         _has_devanagari = any('\u0900' <= c <= '\u097f' for c in customer_text)
-        _has_latin = any('a' <= c.lower() <= 'z' for c in customer_text)
-        _is_garbage = not (_has_devanagari or _has_latin)
-        _is_filler = customer_text.lower().strip(".,!? ") in {
-            "well", "uh", "um", "oh", "i", "absolutely", "menor", "ok", "okay"
+        _has_latin      = any('a' <= c.lower() <= 'z' for c in customer_text)
+        _has_arabic     = any('\u0600' <= c <= '\u06ff' for c in customer_text)  # Urdu
+        _has_digits     = any(c.isdigit() for c in customer_text)
+        _is_garbage     = not (_has_devanagari or _has_latin or _has_arabic or _has_digits)        _is_filler = customer_text.lower().strip(".,!? ") in {
+             "well", "uh", "um", "oh", "i", "menor", "çorunga", "alogyтv"
         }
 
         if not customer_text or _is_garbage or _is_filler or len(customer_text) < 4:
