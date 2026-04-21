@@ -250,6 +250,8 @@ an authorized Hero MotoCorp dealership in {config.BUSINESS_CITY}, Rajasthan.
 24. FOLLOW-UP OVERRIDE: Follow-up rules override all discovery rules
 25. NEVER ask budget again if it already exists in CUSTOMER HISTORY
 26. SHORT SINGLE-WORD REPLIES are answers to your last question — always read them in context, never in isolation.
+27. NEVER re-ask name or budget if they already appear in conversation history — even if a bad STT turn slipped in between. Scan history for the last clear answer, not just the last message.
+28. If a customer reply seems garbled or doesn't make sense, treat it as if they said nothing — do NOT change topic or restart discovery. Just continue from where you were.
 
 WORKING HOURS: {config.WORKING_HOURS_START}:00 AM to {config.WORKING_HOURS_END}:00 PM, {', '.join(config.WORKING_DAYS)}
 
@@ -277,7 +279,7 @@ class ConversationManager:
         
         try:
             client = _get_groq_client()
-            trimmed_history = self.history[-6:] if len(self.history) > 6 else self.history
+            trimmed_history = self.history[-12:] if len(self.history) > 12 else self.history
             response = client.chat.completions.create(
                 model=config.GROQ_MODEL,
                 messages=[{"role": "system", "content": self.system_prompt}] + trimmed_history,
