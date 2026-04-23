@@ -30,9 +30,9 @@ GROQ_API_KEY        = os.getenv("GROQ_API_KEY", "").strip()
 
 # 🔥 OPTIMIZATION: Hybrid model routing — fast model for simple queries, smart model for complex
 GROQ_FAST_MODEL     = os.getenv("GROQ_FAST_MODEL", "llama-3.1-8b-instant").strip()
-GROQ_SMART_MODEL    = os.getenv("GROQ_SMART_MODEL", "llama-3.1-70b-versatile").strip()
+GROQ_SMART_MODEL    = os.getenv("GROQ_SMART_MODEL", "llama-3.3-70b-versatile").strip()
 # Keep original for backward compatibility
-GROQ_MODEL          = os.getenv("GROQ_MODEL", "llama-3.1-70b-versatile").strip()
+GROQ_MODEL          = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile").strip()
 
 DEEPGRAM_API_KEY    = os.getenv("DEEPGRAM_API_KEY", "").strip()
 SARVAM_API_KEY      = os.getenv("SARVAM_API_KEY", "").strip()
