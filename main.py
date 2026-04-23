@@ -797,7 +797,9 @@ async def voicebot_stream(websocket: WebSocket):
         if call_sid:
             end_call_session(call_sid, 0)
     except Exception as e:
+        import traceback
         print(f"[Voicebot] Error: {e}")
+        print(traceback.format_exc())
         if call_sid:
             end_call_session(call_sid, 0)
 
