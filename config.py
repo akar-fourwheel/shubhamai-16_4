@@ -36,8 +36,7 @@ GROQ_MODEL          = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile").strip()
 
 DEEPGRAM_API_KEY    = os.getenv("DEEPGRAM_API_KEY", "").strip()
 SARVAM_API_KEY      = os.getenv("SARVAM_API_KEY", "").strip()
-# [+] CHANGE: ngrok-specific token removed from active configuration surface.
-# [-] Removed: NGROK_AUTH_TOKEN
+GEMINI_API_KEY      = os.getenv("GEMINI_API_KEY", "").strip()
 
 # -- Google Sheets (optional) -------------------------------------------------
 GOOGLE_SHEET_ID     = os.getenv("GOOGLE_SHEET_ID", "").strip()

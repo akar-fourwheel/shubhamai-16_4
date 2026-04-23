@@ -14,7 +14,6 @@ TRAINING: This AI is trained with world's best sales techniques:
 import json, re, logging
 from datetime import datetime, timedelta
 
-from groq import Groq
 
 import config
 from scraper import get_bike_catalog, format_catalog_for_ai
@@ -22,14 +21,18 @@ from sheets_manager import get_active_offers, get_loss_reasons
 
 log = logging.getLogger("shubham-ai.agent")
 
-_groq_client = None
-def _get_groq_client() -> Groq:
-    global _groq_client
-    if _groq_client is None:
-        if not config.GROQ_API_KEY:
-            raise RuntimeError("GROQ_API_KEY is not configured")
-        _groq_client = Groq(api_key=config.GROQ_API_KEY)
-    return _groq_client
+from openai import OpenAI
+_llm_client = None
+def _get_llm_client() -> OpenAI:
+    global _llm_client
+    if _llm_client is None:
+        if not config.GEMINI_API_KEY:
+            raise RuntimeError("GEMINI_API_KEY is not configured")
+        _llm_client = OpenAI(
+            api_key=config.GEMINI_API_KEY,
+            base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
+        )
+    return _llm_client
     
 # ── SYSTEM PROMPT ─────────────────────────────────────────────────────────────
 
@@ -278,17 +281,17 @@ class ConversationManager:
         self.history.append({"role": "user", "content": user_message})
         
         try:
-            client = _get_groq_client()
+            client = _get_llm_client()
             trimmed_history = self.history[-12:] if len(self.history) > 12 else self.history
             response = client.chat.completions.create(
-                model=config.GROQ_MODEL,
+                model="gemini-2.0-flash",
                 messages=[{"role": "system", "content": self.system_prompt}] + trimmed_history,
                 temperature=0.8,
                 max_tokens=80,
             )
             ai_reply = response.choices[0].message.content
         except Exception as exc:
-            log.error("Groq chat failed: %s", exc)
+            log.error("LLM chat failed: %s", exc)
             ai_reply = "Ji, main samajh rahi hoon. Kya aap thoda aur detail de sakte hain?"
 
         self.history.append({"role": "assistant", "content": ai_reply})
@@ -348,9 +351,9 @@ Return ONLY valid JSON (no markdown, no explanation):
 }}"""
         
         try:
-            client = _get_groq_client()
+            client = _get_llm_client()
             r = client.chat.completions.create(
-                model=config.GROQ_FAST_MODEL,
+                model="gemini-2.0-flash",
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0,
                 max_tokens=500,
