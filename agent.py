@@ -284,7 +284,7 @@ class ConversationManager:
             client = _get_llm_client()
             trimmed_history = self.history[-12:] if len(self.history) > 12 else self.history
             response = client.chat.completions.create(
-                model="gemini-2.0-flash",
+                model="gemini-2.5-flash-lite",
                 messages=[{"role": "system", "content": self.system_prompt}] + trimmed_history,
                 temperature=0.8,
                 max_tokens=80,
@@ -353,7 +353,7 @@ Return ONLY valid JSON (no markdown, no explanation):
         try:
             client = _get_llm_client()
             r = client.chat.completions.create(
-                model="gemini-2.0-flash",
+                model="gemini-2.5-flash-lite",
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0,
                 max_tokens=500,
